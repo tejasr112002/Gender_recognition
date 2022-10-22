@@ -52,13 +52,31 @@ def get_dataframe(path, frontal=False):
 
     return df
 
+
 def barplots_of_labels(df):
     # make age and gender barplots in subplots
     fig, ax = plt.subplots(2, 2, figsize=(10, 8))
-    df.age.value_counts().plot(kind='bar', ax=ax[0,0])
-    df.gender.value_counts().plot(kind='bar', ax=ax[0,1])
-    df.age[df.gender == 'f'].value_counts().plot(kind='bar', ax=ax[1,0])
-    df.age[df.gender == 'm'].value_counts().plot(kind='bar', ax=ax[1,1])
+    df.age.value_counts().plot(kind="bar", ax=ax[0, 0])
+    df.gender.value_counts().plot(kind="bar", ax=ax[0, 1])
+    df.age[df.gender == "f"].value_counts().plot(kind="bar", ax=ax[1, 0])
+    df.age[df.gender == "m"].value_counts().plot(kind="bar", ax=ax[1, 1])
+
+
+def get_dataset(df, n_max=False, new_size=False):
+    # create a dataset from a dataframe
+    images = []
+    N = n_max if n_max else len(df)
+    new_size = new_size if new_size else (224, 224)
+    for i in range(N):
+        # read image
+        image = cv2.imread(f"data/aligned/{df.image_path[i]}")
+        # resize image
+        image = cv2.resize(image, new_size)
+        # convert to RGB
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        images.append(image)
+    images = np.array(images)
+    return images
 
 
 if __name__ == "__main__":
