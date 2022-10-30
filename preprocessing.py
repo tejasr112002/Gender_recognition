@@ -116,6 +116,15 @@ class DatasetPreprocessing:
     def get_gender_label(self, gender):
         return self.genders[gender]
 
+    def get_classes(self):
+        return genders, ages
+
+    def get_dataset(self):
+        return self.dataset
+
+    def get_dataframe(self):
+        return self.df
+
     def get_train_test_split(self, test_size=0.3, random_state=42):
         train_df, test_df = train_test_split(
             self.df, test_size=test_size, random_state=random_state
@@ -130,15 +139,6 @@ class DatasetPreprocessing:
             for train_index, test_index in kf.split(self.df)
         ]
         return cv_splits
-
-    def get_classes(self):
-        return genders, ages
-
-    def get_dataset(self):
-        return self.dataset
-
-    def get_dataframe(self):
-        return self.df
 
 
 if __name__ == "__main__":
