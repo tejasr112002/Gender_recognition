@@ -23,7 +23,7 @@ ages = [
 
 
 # make Dataset preprocessing class
-class DatasetPreprocessing:
+class DataPreprocessing:
     def __init__(self, path="data", frontal=False, n_max=None, new_size=None):
         self.genders = ["m", "f"]
         self.ages = [
@@ -40,16 +40,16 @@ class DatasetPreprocessing:
         self.n_max = n_max
         self.frontal = frontal
         self.path = path
-        self.df = self._get_preprocessed_dataframe()
-        self.dataset = self._dataframe_to_dataset(self.df)
+        self.dfs = self._get_preprocessed_dataframes()
+        self.datasets = self.get_cv_splits()
 
-    def _get_preprocessed_dataframe(self):
-        df = self._load_raw_data(self.path, self.frontal)
-        df = self._preprocess_dataframe(df)
+    def _get_preprocessed_dataframes(self):
+        dfs = self._load_raw_data(self.path, self.frontal)
+        dfs_preprocesed = [self._preprocess_dataframe(df) for df in dfs]
         # sample n_max rows
         if self.n_max is not None:
-            df = df.sample(n=self.n_max)
-        return df
+            dfs_preprocesed = [df.sample(n=self.n_max) for df in dfs_preprocesed]
+        return dfs_preprocesed
 
     def _load_raw_data(self, path="data", frontal=False):
         if frontal:
@@ -59,8 +59,8 @@ class DatasetPreprocessing:
             ]
         else:
             dfs = [pd.read_csv(f"{path}/fold_{i}_data.txt", sep="\t") for i in range(5)]
-        df = pd.concat(dfs, ignore_index=True)
-        return df
+        # df = pd.concat(dfs, ignore_index=True)
+        return dfs
 
     def _preprocess_dataframe(self, df):
         # add image paths
@@ -105,10 +105,11 @@ class DatasetPreprocessing:
             # extract gender and age from df and append tuple
             dataset.append((image, row.gender, row.age))
         # convert to data set to a tuple of numpy arrays
-        return tuple(map(np.array, zip(*dataset)))
+        X, y1, y2 = tuple(map(np.array, zip(*dataset)))
+        return (X, (y1, y2))
 
     def _map_to_datasets(self, dfs):
-        return tuple(map(self._dataframe_to_dataset, dfs))
+        return sum(tuple(map(self._dataframe_to_dataset, dfs)), ())  # flatten
 
     def get_age_label(self, age):
         return self.ages[age]
@@ -119,26 +120,37 @@ class DatasetPreprocessing:
     def get_classes(self):
         return genders, ages
 
-    def get_dataset(self):
-        return self.dataset
+    def get_cv_datasets(self):
+        return self.datasets
 
     def get_dataframe(self):
-        return self.df
+        return self.dfs
 
-    def get_train_test_split(self, test_size=0.3, random_state=42):
-        train_df, test_df = train_test_split(
-            self.df, test_size=test_size, random_state=random_state
-        )
-        return self._map_to_datasets([train_df, test_df])
+    def get_cv_splits(self):
+        cv_splits = []
+        for i in range(5):
+            dfs_copy = self.dfs[:]
+            dfs_copy.pop(i)
+            train_df = pd.concat(dfs_copy, ignore_index=True)
+            test_df = self.dfs[i]
+            cv_splits.append(self._map_to_datasets([train_df, test_df]))
 
-    def get_cv_splits(self, n_splits=5, random_state=42):
-        kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-        # make a list of (train_df, test_df) tuples
-        cv_splits = [
-            self._map_to_datasets([self.df.iloc[train_index], self.df.iloc[test_index]])
-            for train_index, test_index in kf.split(self.df)
-        ]
         return cv_splits
+
+    # def get_train_test_split(self, test_size=0.3, random_state=42):
+    #     train_df, test_df = train_test_split(
+    #         self.df, test_size=test_size, random_state=random_state
+    #     )
+    #     return self._map_to_datasets([train_df, test_df])
+
+    # def _get_cv_splits(self, n_splits=5, random_state=42):
+    #     kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+    #     # make a list of (train_df, test_df) tuples
+    #     cv_splits = [
+    #         self._map_to_datasets([self.df.iloc[train_index], self.df.iloc[test_index]])
+    #         for train_index, test_index in kf.split(self.df)
+    #     ]
+    #     return cv_splits
 
 
 if __name__ == "__main__":
