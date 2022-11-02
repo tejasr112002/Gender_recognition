@@ -42,7 +42,7 @@ class Trainer:
                 metrics=self.metrics,
             )
 
-    def train_model(self, model_name):
+    def train_model(self, model_name, all_folds=True):
         self.compile_model(model_name)
         model = self.models[model_name][0]  # get model
         target = self.models[model_name][1]  # get target
@@ -64,5 +64,7 @@ class Trainer:
                 validation_data=(X_test, y_test),
             )
             histories.append(history)
+            if all_folds != True:
+                break
 
         return histories

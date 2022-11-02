@@ -2,6 +2,7 @@ from initialsation import *
 from preprocessing import DataPreprocessing
 from models import main_model, baseline_model, CNN_classic, CNN_transfer, CNN_multitask
 from trainer import Trainer
+import plot_functions as pf
 
 # set seed for reproducibility
 set_seed(42)
@@ -21,9 +22,7 @@ models = {
     # "CNN multitask": (CNN_multitask(img_size),"multi" 0.5),
 }
 
-trainer = Trainer(models, datasets, epochs=10)
-histories = trainer.train("Main Model")
+trainer = Trainer(models, datasets, no_epochs=10)
+histories = trainer.train_model("Main Model", all_folds=False)
 
-
-model = models["Main Model"][0]
-model.summary()
+pf.plot_history(histories[0], "Main Model")

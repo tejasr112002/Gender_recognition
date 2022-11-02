@@ -32,6 +32,33 @@ def main_model(img_size, seed=42):
     return model
 
 
+def main_model(img_size, seed=42):
+    model = keras.Sequential(
+        [
+            layers.Input(shape=(img_size, img_size, 3)),
+            # add data augmentation here
+            layers.RandomCrop(227, 227, seed=seed),
+            layers.Rescaling(1.0 / 255),
+            layers.Conv2D(43, 7, padding="same", activation="relu"),
+            layers.MaxPooling2D((3, 3), strides=2),
+            layers.Lambda(tf.nn.local_response_normalization),
+            layers.Conv2D(128, 5, padding="same", activation="relu"),
+            layers.MaxPooling2D((3, 3), strides=2),
+            layers.Lambda(tf.nn.local_response_normalization),
+            layers.Conv2D(192, 3, padding="same", activation="relu"),
+            layers.MaxPooling2D((3, 3), strides=2),
+            layers.Flatten(),
+            layers.Dense(512, activation="relu"),
+            layers.Dropout(0.5),
+            layers.Dense(512, activation="relu"),
+            layers.Dropout(0.5),
+            layers.Dense(1, activation="sigmoid"),
+        ],
+        name="CNN_classic",
+    )
+    return model
+
+
 # make baseline model that just predict the majority class
 def baseline_model(img_size):
     model = keras.Sequential(
