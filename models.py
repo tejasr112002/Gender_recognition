@@ -5,6 +5,36 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+
+def main_model_modified(img_size, reducer = 2, seed=42):
+    model = keras.Sequential(
+        [
+            layers.Input(shape=(img_size, img_size, 3)),
+            # add data augmentation here
+            layers.RandomCrop(227, 227, seed=seed),
+            layers.Rescaling(1.0 / 255),
+            layers.Conv2D(96 // reducer, 7, padding="same", activation="relu"),
+            layers.MaxPooling2D((3, 3), strides=2),
+            layers.Lambda(tf.nn.local_response_normalization),
+            layers.Conv2D(256 // reducer, 5, padding="same", activation="relu"),
+            layers.MaxPooling2D((3, 3), strides=2),
+            layers.Lambda(tf.nn.local_response_normalization),
+            layers.Conv2D(384 // reducer, 3, padding="same", activation="relu"),
+            layers.MaxPooling2D((3, 3), strides=2),
+            layers.Flatten(),
+            layers.Dense(512 // reducer, activation="relu"),
+            layers.Dropout(0.5),
+            layers.Dense(512 // reducer, activation="relu"),
+            layers.Dropout(0.5),
+            layers.Dense(1, activation="sigmoid"),
+        ],
+        name="CNN_classic",
+    )
+    return model
+
+
+
+
 def main_model(img_size, seed=42):
     model = keras.Sequential(
         [
