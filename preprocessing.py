@@ -24,7 +24,7 @@ ages = [
 
 # make Dataset preprocessing class
 class DataPreprocessing:
-    def __init__(self, path="data", frontal=False, n_max=None, new_size=None):
+    def __init__(self, path, frontal=False, n_max=None, new_size=None):
         self.genders = ["m", "f"]
         self.ages = [
             "(0, 2)",
@@ -44,21 +44,23 @@ class DataPreprocessing:
         self.datasets = self.get_cv_splits()
 
     def _get_preprocessed_dataframes(self):
-        dfs = self._load_raw_data(self.path, self.frontal)
-        dfs_preprocesed = [self._preprocess_dataframe(df) for df in dfs]
+        dfs = self._load_raw_data()
+        dfs_preprocesed = [self._preprocess_dataframe(df).sample(frac=1) for df in dfs]
         # sample n_max rows
         if self.n_max is not None:
             dfs_preprocesed = [df.sample(n=self.n_max) for df in dfs_preprocesed]
         return dfs_preprocesed
 
-    def _load_raw_data(self, path="data", frontal=False):
-        if frontal:
+    def _load_raw_data(self):
+        if self.frontal:
             dfs = [
-                pd.read_csv(f"{path}/fold_frontal_{i}_data.txt", sep="\t")
+                pd.read_csv(f"{self.path}fold_frontal_{i}_data.txt", sep="\t")
                 for i in range(5)
             ]
         else:
-            dfs = [pd.read_csv(f"{path}/fold_{i}_data.txt", sep="\t") for i in range(5)]
+            dfs = [
+                pd.read_csv(f"{self.path}fold_{i}_data.txt", sep="\t") for i in range(5)
+            ]
         # df = pd.concat(dfs, ignore_index=True)
         return dfs
 
@@ -130,9 +132,8 @@ class DataPreprocessing:
         cv_splits = []
         for i in range(5):
             dfs_copy = self.dfs[:]
-            dfs_copy.pop(i)
+            test_df = dfs_copy.pop(i)
             train_df = pd.concat(dfs_copy, ignore_index=True)
-            test_df = self.dfs[i]
             cv_splits.append(self._map_to_datasets([train_df, test_df]))
 
         return cv_splits

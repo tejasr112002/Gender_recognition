@@ -1,28 +1,37 @@
 from initialsation import *
-from preprocessing import DataPreprocessing
-from models import main_model, baseline_model, CNN_classic, CNN_transfer, CNN_multitask
-from trainer import Trainer
-import plot_functions as pf
 
-# set seed for reproducibility
-set_seed(42)
-
-
+SEED = 42
 IMG_SIZE = 256
 
-preprocessing = DataPreprocessing(path="data", n_max=25, new_size=(IMG_SIZE, IMG_SIZE))
-datasets = (
-    preprocessing.get_cv_datasets()
-)  # list of (X_train, (y_train_gender, y_train_age), X_test, (y_train_gender, y_train_age))
+# set seed for reproducibility and
+set_seed(SEED)
+turn_off_warnings()
 
-models = {
-    "Main Model": (main_model(IMG_SIZE), "gender", None),
-    # "CNN classic": (CNN_classic(img_size),"gender", None),
-    # "CNN transfer": (CNN_transfer(img_size),"gender", None),
-    # "CNN multitask": (CNN_multitask(img_size),"multi" 0.5),
+preprocessing = DataPreprocessing(DATA_PATH, n_max=5, new_size=(IMG_SIZE, IMG_SIZE))
+# list of (X_train, (y_train_gender, y_train_age), X_test, (y_train_gender, y_train_age))
+datasets = preprocessing.get_cv_datasets()
+
+models = {  # dictionary of models - name : (model, target, gamma)
+    "Baseline": (baseline_model(IMG_SIZE), "gender", None),
+    "Main Model": (main_model(IMG_SIZE, reducer=1, seed=42), "gender", None),
+    "CNN transfer": (CNN_transfer(IMG_SIZE), "gender", None),
+    "CNN multitask": (CNN_multitask(IMG_SIZE), "multi", 0.5),
 }
 
-trainer = Trainer(models, datasets, no_epochs=10)
-histories = trainer.train_model("Main Model", all_folds=False)
+trainer = Trainer(
+    models,
+    datasets,
+    checkpoint_filepath=CHECKPOINT_PATH,
+    histories_filepath=HISTORIES_PATH,
+    no_epochs=10,
+    batch_size=50,
+    patience=10,
+    all_folds=False,
+    use_multiprocessing=False,
+)
 
-pf.plot_history(histories[0], "Main Model")
+# train
+# for model in models.keys():
+#     trainer.train_model(model)
+
+trainer.train_model("CNN multitask")

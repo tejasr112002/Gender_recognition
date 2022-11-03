@@ -4,9 +4,21 @@ from keras import layers
 import matplotlib.pyplot as plt
 import numpy as np
 
+# make baseline model that just predict the majority class
+def baseline_model(img_size):
+    model = keras.Sequential(
+        [
+            layers.Input(shape=(img_size, img_size, 3)),
+            layers.Rescaling(1.0 / 255),
+            layers.Flatten(),
+            layers.Dense(1, activation="sigmoid"),
+        ],
+        name="baseline",
+    )
+    return model
 
 
-def main_model_modified(img_size, reducer = 2, seed=42):
+def main_model(img_size, reducer=2, seed=42):
     model = keras.Sequential(
         [
             layers.Input(shape=(img_size, img_size, 3)),
@@ -27,101 +39,7 @@ def main_model_modified(img_size, reducer = 2, seed=42):
             layers.Dense(512 // reducer, activation="relu"),
             layers.Dropout(0.5),
             layers.Dense(1, activation="sigmoid"),
-        ],
-        name="CNN_classic",
-    )
-    return model
-
-
-
-
-def main_model(img_size, seed=42):
-    model = keras.Sequential(
-        [
-            layers.Input(shape=(img_size, img_size, 3)),
-            # add data augmentation here
-            layers.RandomCrop(227, 227, seed=seed),
-            layers.Rescaling(1.0 / 255),
-            layers.Conv2D(96, 7, padding="same", activation="relu"),
-            layers.MaxPooling2D((3, 3), strides=2),
-            layers.Lambda(tf.nn.local_response_normalization),
-            layers.Conv2D(256, 5, padding="same", activation="relu"),
-            layers.MaxPooling2D((3, 3), strides=2),
-            layers.Lambda(tf.nn.local_response_normalization),
-            layers.Conv2D(384, 3, padding="same", activation="relu"),
-            layers.MaxPooling2D((3, 3), strides=2),
-            layers.Flatten(),
-            layers.Dense(512, activation="relu"),
-            layers.Dropout(0.5),
-            layers.Dense(512, activation="relu"),
-            layers.Dropout(0.5),
-            layers.Dense(1, activation="sigmoid"),
-        ],
-        name="CNN_classic",
-    )
-    return model
-
-
-def main_model(img_size, seed=42):
-    model = keras.Sequential(
-        [
-            layers.Input(shape=(img_size, img_size, 3)),
-            # add data augmentation here
-            layers.RandomCrop(227, 227, seed=seed),
-            layers.Rescaling(1.0 / 255),
-            layers.Conv2D(43, 7, padding="same", activation="relu"),
-            layers.MaxPooling2D((3, 3), strides=2),
-            layers.Lambda(tf.nn.local_response_normalization),
-            layers.Conv2D(128, 5, padding="same", activation="relu"),
-            layers.MaxPooling2D((3, 3), strides=2),
-            layers.Lambda(tf.nn.local_response_normalization),
-            layers.Conv2D(192, 3, padding="same", activation="relu"),
-            layers.MaxPooling2D((3, 3), strides=2),
-            layers.Flatten(),
-            layers.Dense(512, activation="relu"),
-            layers.Dropout(0.5),
-            layers.Dense(512, activation="relu"),
-            layers.Dropout(0.5),
-            layers.Dense(1, activation="sigmoid"),
-        ],
-        name="CNN_classic",
-    )
-    return model
-
-
-# make baseline model that just predict the majority class
-def baseline_model(img_size):
-    model = keras.Sequential(
-        [
-            layers.Input(shape=(img_size, img_size, 3)),
-            layers.Rescaling(1.0 / 255),
-            layers.Flatten(),
-            layers.Dense(1, activation="sigmoid"),
-        ],
-        name="baseline",
-    )
-    return model
-
-
-# function to create standard CNN network
-# idea: expand function such that its easy to change the architechture
-def CNN_classic(img_size):
-    model = keras.Sequential(
-        [
-            layers.Input(shape=(img_size, img_size, 3)),
-            layers.Rescaling(1.0 / 255),
-            # layers.Rescaling(scale = 1./127.5, offset = -1), do this if we want to be consistent with the transfer learning network
-            layers.Conv2D(16, 3, padding="same", activation="relu"),
-            layers.MaxPooling2D(),
-            layers.Conv2D(32, 3, padding="same", activation="relu"),
-            layers.MaxPooling2D(),
-            layers.Conv2D(64, 3, padding="same", activation="relu"),
-            layers.MaxPooling2D(),
-            layers.Flatten(),
-            layers.Dense(128, activation="relu"),
-            layers.Dense(1, activation="sigmoid"),
-        ],
-        name="CNN_classic",
+        ]
     )
     return model
 
@@ -149,7 +67,7 @@ def CNN_transfer(img_size):
     x = layers.GlobalAveragePooling2D()(x)
     outputs = layers.Dense(1, activation="sigmoid")(x)
 
-    model = keras.Model(input, outputs, name="CNN_transfer")
+    model = keras.Model(input, outputs)
     return model
 
 
@@ -184,9 +102,7 @@ def CNN_multitask(img_size):
         task_2_branch
     )
 
-    model = tf.keras.Model(
-        inputs=inputs, outputs=[task_1_branch, task_2_branch], name="CNN_multitask"
-    )
+    model = tf.keras.Model(inputs=inputs, outputs=[task_1_branch, task_2_branch])
     return model
 
 
