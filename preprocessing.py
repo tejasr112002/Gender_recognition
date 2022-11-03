@@ -1,5 +1,6 @@
 """
 Dataset preprocessing class
+
 """
 import numpy as np
 import pandas as pd
@@ -123,6 +124,7 @@ class DataPreprocessing:
         return genders, ages
 
     def get_cv_datasets(self):
+        # returns list of (X_train, (y_train_gender, y_train_age), X_test, (y_train_gender, y_train_age))
         return self.datasets
 
     def get_dataframe(self):
