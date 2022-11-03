@@ -41,8 +41,6 @@ class DataPreprocessing:
         self.n_max = n_max
         self.frontal = frontal
         self.path = path
-        self.dfs = self._get_preprocessed_dataframes()
-        self.datasets = self.get_cv_splits()
 
     def _get_preprocessed_dataframes(self):
         dfs = self._load_raw_data()
@@ -123,17 +121,12 @@ class DataPreprocessing:
     def get_classes(self):
         return genders, ages
 
-    def get_cv_datasets(self):
-        # returns list of (X_train, (y_train_gender, y_train_age), X_test, (y_train_gender, y_train_age))
-        return self.datasets
-
-    def get_dataframe(self):
-        return self.dfs
-
     def get_cv_splits(self):
+        # returns list of (X_train, (y_train_gender, y_train_age), X_test, (y_train_gender, y_train_age))
+        dfs = self._get_preprocessed_dataframes()
         cv_splits = []
         for i in range(5):
-            dfs_copy = self.dfs[:]
+            dfs_copy = dfs[:]
             test_df = dfs_copy.pop(i)
             train_df = pd.concat(dfs_copy, ignore_index=True)
             cv_splits.append(self._map_to_datasets([train_df, test_df]))

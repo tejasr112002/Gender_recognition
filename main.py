@@ -12,7 +12,7 @@ turn_off_warnings()  # turn of warnings
 
 # LOADING DATA
 preprocessing = DataPreprocessing(DATA_PATH, n_max=N_MAX, new_size=(IMG_SIZE, IMG_SIZE))
-datasets = preprocessing.get_cv_datasets()
+datasets = preprocessing.get_cv_splits()
 
 # DEFINING THE MODELS THAT WE WANT TO TRAIN - name : (model, target, gamma)
 models = {
