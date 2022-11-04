@@ -4,24 +4,7 @@ Dataset preprocessing class
 """
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import cv2
-import random
-from sklearn.model_selection import train_test_split, KFold
-
-
-genders = ["m", "f"]
-ages = [
-    "(0, 2)",
-    "(4, 6)",
-    "(8, 12)",
-    "(15, 20)",
-    "(25, 32)",
-    "(38, 43)",
-    "(48, 53)",
-    "(60, 100)",
-]
-
 
 # make Dataset preprocessing class
 class DataPreprocessing:
@@ -80,8 +63,8 @@ class DataPreprocessing:
         df = df[[x in self.ages for x in df.age]]
 
         # convert age and gender labels to indexes
-        df.age = df.age.apply(lambda x: ages.index(x))
-        df.gender = df.gender.apply(lambda x: genders.index(x))
+        df.age = df.age.apply(lambda x: self.ages.index(x))
+        df.gender = df.gender.apply(lambda x: self.genders.index(x))
 
         return df
 
@@ -135,7 +118,7 @@ class DataPreprocessing:
 
     def get_summary_stats(self):
         df = pd.concat(self._get_preprocessed_dataframes())
-        df_unique =  df.drop_duplicates("face_id")
+        df_unique = df.drop_duplicates("face_id")
         return df, {
             "no_data": df.shape[0],
             "no_male": sum(df.gender == 0),

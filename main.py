@@ -2,12 +2,12 @@ from initialsation import *
 
 SEED = 42
 IMG_SIZE = 256
-N_MAX = None  # use to select only subset of the data N_max = 25 means we use 25 samples from each fold
+N_MAX = 5  # None  # use to select only subset of the data N_max = 25 means we use 25 samples from each fold
 N_EPOCHS = 10
 BATCH_SIZE = 50
 PATIENCE = 10  # FOR EARLY STOPPING
-USE_MULTIPROCESSING = True
-USE_ALL_FOLDS = True
+USE_MULTIPROCESSING = False
+USE_ALL_FOLDS = False
 
 
 set_seed(SEED)  # set seed for reproducibility
