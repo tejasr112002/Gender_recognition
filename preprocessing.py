@@ -4,6 +4,7 @@ Dataset preprocessing class
 """
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import cv2
 
 # make Dataset preprocessing class
@@ -81,13 +82,7 @@ class DataPreprocessing:
     def _dataframe_to_dataset(self, df):
         dataset = []
         for row in df.itertuples():
-            # read image
-            image = cv2.imread(f"data/aligned/{row.image_path}")
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            if self.new_size is not None:
-                image = cv2.resize(image, self.new_size)
-            # extract gender and age from df and append tuple
-            dataset.append((image, row.gender, row.age))
+            dataset.append(self.get_image_from_row(row))
         # convert to data set to a tuple of numpy arrays
         X, y1, y2 = tuple(map(np.array, zip(*dataset)))
         return (X, (y1, y2))
@@ -100,6 +95,13 @@ class DataPreprocessing:
 
     def get_gender_label(self, gender):
         return self.genders[gender]
+
+    def get_image_from_row(self, row):
+        image = plt.imread(f"{self.path}aligned/{row.image_path}")
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if self.new_size is not None:
+            image = cv2.resize(image, self.new_size)
+        return (image, row.gender, row.age)
 
     def get_classes(self):
         return self.genders, self.ages
@@ -117,7 +119,7 @@ class DataPreprocessing:
         return cv_splits
 
     def get_summary_stats(self):
-        df = pd.concat(self._get_preprocessed_dataframes())
+        df = pd.concat(self._get_preprocessed_dataframes(), ignore_index=True)
         df_unique = df.drop_duplicates("face_id")
         return df, {
             "no_data": df.shape[0],
