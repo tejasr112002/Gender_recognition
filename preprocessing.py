@@ -68,7 +68,7 @@ class DataPreprocessing:
         image_path = self._get_image_paths(df)
         df.insert(0, "image_path", image_path)
         # select only the columns we need
-        df = df[["image_path", "age", "gender"]]
+        # df = df[["image_path", "age", "gender"]]
 
         # drop rows with missing values
         df = df.dropna()
@@ -133,20 +133,17 @@ class DataPreprocessing:
 
         return cv_splits
 
-    # def get_train_test_split(self, test_size=0.3, random_state=42):
-    #     train_df, test_df = train_test_split(
-    #         self.df, test_size=test_size, random_state=random_state
-    #     )
-    #     return self._map_to_datasets([train_df, test_df])
-
-    # def _get_cv_splits(self, n_splits=5, random_state=42):
-    #     kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-    #     # make a list of (train_df, test_df) tuples
-    #     cv_splits = [
-    #         self._map_to_datasets([self.df.iloc[train_index], self.df.iloc[test_index]])
-    #         for train_index, test_index in kf.split(self.df)
-    #     ]
-    #     return cv_splits
+    def get_summary_stats(self):
+        df = pd.concat(self._get_preprocessed_dataframes())
+        df_unique =  df.drop_duplicates("face_id")
+        return df, {
+            "no_data": df.shape[0],
+            "no_male": sum(df.gender == 0),
+            "no_female": sum(df.gender == 1),
+            "no_data_unique": df_unique.shape[0],
+            "no_male_unique": sum(df_unique.gender == 0),
+            "no_female_unique": sum(df_unique.gender == 1),
+        }
 
 
 if __name__ == "__main__":

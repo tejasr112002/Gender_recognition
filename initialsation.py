@@ -10,7 +10,7 @@ import pickle
 import glob
 
 from preprocessing import DataPreprocessing
-from models import baseline_model, main_model, CNN_transfer, CNN_multitask
+from models import *
 from trainer import Trainer
 import plot_functions as pf
 
