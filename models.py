@@ -55,8 +55,10 @@ def _get_imagenet_base_model(img_size):
         input_shape=(img_size, img_size, 3),
         include_top=False,
     )
-    # freeze weights
-    base_model.trainable = False
+    # freeze all layers except the last 10
+    for layer in base_model.layers[:-10]:
+        layer.trainable = False
+
     return base_model
 
 
