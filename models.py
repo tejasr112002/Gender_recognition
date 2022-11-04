@@ -61,8 +61,8 @@ def _get_imagenet_base_model(inputs, img_size):
 
 
 def _add_data_augmenting(inputs, crop_size, seed=42):
-    inputs = layers.Rescaling(scale=1 / 127.5, offset=-1)(inputs)
     inputs = layers.RandomCrop(crop_size, crop_size, seed=seed)(inputs)
+    inputs = layers.Rescaling(scale=1 / 127.5, offset=-1)(inputs)
     return inputs
 
 

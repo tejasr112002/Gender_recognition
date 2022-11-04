@@ -102,7 +102,7 @@ class DataPreprocessing:
         return self.genders[gender]
 
     def get_classes(self):
-        return genders, ages
+        return self.genders, self.ages
 
     def get_cv_splits(self):
         # returns list of (X_train, (y_train_gender, y_train_age), X_test, (y_train_gender, y_train_age))
