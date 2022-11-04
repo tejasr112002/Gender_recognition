@@ -78,21 +78,20 @@ def _get_main_branch(inputs, reducer=1):
             layers.Conv2D(384 // reducer, 3, padding="same", activation="relu"),
             layers.MaxPooling2D((3, 3), strides=2),
             layers.Lambda(tf.nn.local_response_normalization),
-            layers.Flatten(),
         ]
     )
-    return model(inputs)
+    return layers.Flatten()(model(inputs))
 
 
 def _add_gender_branch(main_branch):
-    gender_branch = layers.Dense(256, activation="relu")(main_branch)
-    gender_branch = layers.Dense(128, activation="relu")(gender_branch)
+    gender_branch = layers.Dense(512, activation="relu")(main_branch)
+    gender_branch = layers.Dense(512, activation="relu")(gender_branch)
     output = layers.Dense(1, activation="sigmoid", name="gender")(gender_branch)
     return output
 
 
 def _add_age_branch(main_branch):
-    age_branch = layers.Dense(256, activation="relu")(main_branch)
-    age_branch = layers.Dense(128, activation="relu")(age_branch)
+    age_branch = layers.Dense(512, activation="relu")(main_branch)
+    age_branch = layers.Dense(512, activation="relu")(age_branch)
     output = layers.Dense(8, activation="softmax", name="age")(age_branch)
     return output
