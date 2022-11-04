@@ -2,12 +2,12 @@ from initialsation import *
 
 SEED = 42
 IMG_SIZE = 256
-N_MAX = 5  # None  # use to select only subset of the data N_max = 25 means we use 25 samples from each fold
-N_EPOCHS = 10
+N_MAX = None  # use to select only subset of the data N_max = 25 means we use 25 samples from each fold
+N_EPOCHS = 1000
 BATCH_SIZE = 50
 PATIENCE = 10  # FOR EARLY STOPPING
-USE_MULTIPROCESSING = False
-USE_ALL_FOLDS = False
+USE_MULTIPROCESSING = True
+USE_ALL_FOLDS = True
 
 
 set_seed(SEED)  # set seed for reproducibility
@@ -23,7 +23,7 @@ models = {
     "GenderR4": (model_gender_classification(IMG_SIZE, reducer=4), "gender", None),
     "Age": (model_age_classification(IMG_SIZE), "age", None),
     "Multitask": (model_multitask_classification(IMG_SIZE), "multi", 0.5),
-    "Transfer": (model_transfer_multitask_classification(IMG_SIZE), "gender", 0.5),
+    "Transfer": (model_transfer_multitask_classification(IMG_SIZE), "multi", 0.5),
 }
 
 # TRAIN MODELS ON ALL FOLDS AND SAVE THE BEST MODEL FROM THE LAST FOLD AND SAVE THE TRAIN HISTORIES
