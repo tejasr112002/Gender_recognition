@@ -77,6 +77,7 @@ def _get_main_branch(inputs, reducer=1, seed=42):
             layers.Lambda(tf.nn.local_response_normalization),
             layers.Conv2D(384 // reducer, 3, padding="same", activation="relu"),
             layers.MaxPooling2D((3, 3), strides=2),
+            layers.Lambda(tf.nn.local_response_normalization),
             layers.Flatten(),
         ]
     )
