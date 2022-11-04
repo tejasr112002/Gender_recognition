@@ -69,13 +69,13 @@ def _add_data_augmenting(inputs, crop_size, seed=42):
 def _get_main_branch(inputs, reducer=1):
     model = keras.Sequential(
         [
-            layers.Conv2D(96 // reducer, 7, padding="same", activation="relu"),
+            layers.Conv2D(96 // reducer, 7, activation="relu"),
             layers.MaxPooling2D((3, 3), strides=2),
             layers.Lambda(tf.nn.local_response_normalization),
-            layers.Conv2D(256 // reducer, 5, padding="same", activation="relu"),
+            layers.Conv2D(256 // reducer, 5, activation="relu"),
             layers.MaxPooling2D((3, 3), strides=2),
             layers.Lambda(tf.nn.local_response_normalization),
-            layers.Conv2D(384 // reducer, 3, padding="same", activation="relu"),
+            layers.Conv2D(384 // reducer, 3, activation="relu"),
             layers.MaxPooling2D((3, 3), strides=2),
             layers.Lambda(tf.nn.local_response_normalization),
         ]
