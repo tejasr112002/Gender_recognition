@@ -84,18 +84,19 @@ def _get_main_branch(inputs, reducer=1):
 
 
 def _add_gender_branch(main_branch):
-    gender_branch = layers.Dense(512, activation="relu")(main_branch)
+    gender_branch = layers.Dense(128, activation="relu")(main_branch)
     gender_branch = layers.Dropout(0.5)(gender_branch)
-    gender_branch = layers.Dense(512, activation="relu")(gender_branch)
+    gender_branch = layers.Dense(128, activation="relu")(gender_branch)
     gender_branch = layers.Dropout(0.5)(gender_branch)
     output = layers.Dense(1, activation="sigmoid", name="gender")(gender_branch)
     return output
 
 
 def _add_age_branch(main_branch):
-    age_branch = layers.Dense(512, activation="relu")(main_branch)
+    age_branch = layers.Dense(128, activation="relu")(main_branch)
     age_branch = layers.Dropout(0.5)(age_branch)
-    age_branch = layers.Dense(512, activation="relu")(age_branch)
+    age_branch = layers.Dense(128, activation="relu")(age_branch)
     age_branch = layers.Dropout(0.5)(age_branch)
     output = layers.Dense(8, activation="softmax", name="age")(age_branch)
     return output
+
