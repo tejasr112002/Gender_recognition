@@ -16,14 +16,12 @@ class Trainer:
         batch_size=50,
         no_epochs=10,
         patience=10,
-        all_folds=True,
         use_multiprocessing=True,
     ):
         self.data = data
         self.models = models
         self.patience = patience
         self.batch_size = batch_size
-        self.all_folds = all_folds
         self.use_multiprocessing = use_multiprocessing
         self.checkpoint_filepath = checkpoint_filepath
         self.histories_filepath = histories_filepath
@@ -63,10 +61,10 @@ class Trainer:
     def _callbacks(self, checkpoint_filepath, target):
         if target == "multi":
             monitor = "val_loss"
-            mode = 'min'
+            mode = "min"
         else:
             monitor = "val_accuracy"
-            mode = 'max'
+            mode = "max"
         return [
             keras.callbacks.EarlyStopping(
                 monitor=monitor,
@@ -82,41 +80,35 @@ class Trainer:
             ),
         ]
 
-    def _save_histories(self, histories, model_name):
+    def _save_histories(self, history, model_name, fold):
         dir = self.histories_filepath + model_name
         if not os.path.exists(dir):
             os.makedirs(dir)
-        for i, history in enumerate(histories):
-            path = dir + f"/fold_{i+1}"
-            with open(path, "wb") as f:
-                pickle.dump(history.history, f)
+        path = dir + f"/fold_{fold+1}"
+        with open(path, "wb") as f:
+            pickle.dump(history.history, f)
 
-    def train_model(self, model_name):
+    def train_model(self, model_name, fold=0):
         self.compile_model(model_name)
         model = self.models[model_name][0]  # get model
         target = self.models[model_name][1]  # get target
-        histories = []
-        for data_split in self.data:
-            X_train, y_train, X_test, y_test = data_split
-            if target == "gender":
-                y_train = y_train[0]
-                y_test = y_test[0]
-            elif target == "age":
-                y_train = y_train[1]
-                y_test = y_test[1]
-            history = model.fit(
-                X_train,
-                y_train,
-                batch_size=self.batch_size,
-                use_multiprocessing=self.use_multiprocessing,
-                epochs=self.no_epochs,
-                validation_data=(X_test, y_test),
-                callbacks=self._callbacks(
-                    self.checkpoint_filepath + model_name + "/", target
-                ),
-            )
-            histories.append(history)
-            if self.all_folds != True:
-                break
-
-        self._save_histories(histories, model_name)
+        data_split = self.data[fold]
+        X_train, y_train, X_test, y_test = data_split
+        if target == "gender":
+            y_train = y_train[0]
+            y_test = y_test[0]
+        elif target == "age":
+            y_train = y_train[1]
+            y_test = y_test[1]
+        history = model.fit(
+            X_train,
+            y_train,
+            batch_size=self.batch_size,
+            use_multiprocessing=self.use_multiprocessing,
+            epochs=self.no_epochs,
+            validation_data=(X_test, y_test),
+            callbacks=self._callbacks(
+                self.checkpoint_filepath + model_name + "/", target
+            ),
+        )
+        self._save_histories(history, model_name, fold)

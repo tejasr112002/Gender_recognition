@@ -1,13 +1,16 @@
 from initialsation import *
+import sys
 
+# MODEL = ["Gender", "GenderR4", "Age", "Multitask", "Transfer"][int(sys.argv[1])]
+MODEL = sys.argv[1]
+FOLD = int(sys.argv[2])
 SEED = 42
 IMG_SIZE = 256
-N_MAX = None  # use to select only subset of the data N_max = 25 means we use 25 samples from each fold
-N_EPOCHS = 20
+N_MAX = 5  # use to select only subset of the data N_max = 25 means we use 25 samples from each fold
+N_EPOCHS = 2
 BATCH_SIZE = 128
 PATIENCE = 10  # FOR EARLY STOPPING
 USE_MULTIPROCESSING = True
-USE_ALL_FOLDS = False
 
 
 set_seed(SEED)  # set seed for reproducibility
@@ -35,9 +38,7 @@ trainer = Trainer(
     no_epochs=N_EPOCHS,
     batch_size=BATCH_SIZE,
     patience=PATIENCE,
-    all_folds=USE_ALL_FOLDS,
     use_multiprocessing=USE_MULTIPROCESSING,
 )
 
-for model in models.keys():
-    trainer.train_model(model)
+trainer.train_model(MODEL, fold=FOLD)
