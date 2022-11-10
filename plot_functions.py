@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
 
-def plot_histories(histories, folds=None, style="bmh"):
+def plot_histories(histories, folds=None, style="seaborn-whitegrid"):
     """Plot the training and validation loss for each model in histories."""
     if "gender_loss" in histories[0].keys():
         no_subplots = 3
@@ -47,5 +47,5 @@ def plot_histories(histories, folds=None, style="bmh"):
     # plt.legend(lines, labels, loc = 'lower center', bbox_to_anchor = (0, -0.1, 1, 1),
     #        bbox_transform = plt.gcf().transFigure)
     # fig.legend(handles=handles, loc=[-0.5,-0.2])
-    fig.legend(handles=handles, loc=[0.10, 0], fontsize=12, ncol=7)  # add legend
+    fig.legend(handles=handles, loc=[0.1, 0], fontsize=12, ncol=7)  # add legend
     # fig.tight_layout()
