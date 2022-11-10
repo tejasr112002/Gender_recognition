@@ -15,14 +15,14 @@ def plot_histories(histories, folds=None, style="bmh"):
     handles.append(Line2D([0], [0], color="k", linestyle="-", label="train"))
     handles.append(Line2D([0], [0], color="k", linestyle="--", label="val"))
 
-    fig, ax = plt.subplots(1, no_subplots, figsize=(6.5 * no_subplots, 4.5))
+    fig, ax = plt.subplots(1, no_subplots, figsize=(6 * no_subplots, 5))
     for j, history in enumerate(histories):
         if no_subplots == 3:
             metrics = ["loss", "gender_accuracy", "age_accuracy"]
-            title = ["Cross-entropy loss", "gender accuracy", " age accuracy"]
+            title = ["Joint Cross-Entropy Loss", "Gender Accuracy", " Age Accuracy"]
         else:
             metrics = ["loss", "accuracy"]
-            title = ["Cross-entropy loss", "Classification accuracy"]
+            title = ["Cross-Entropy Loss", "Classification Accuracy"]
         epochs = range(len(history["loss"]))
         for i, metric in enumerate(metrics):
             train = history[metric]
@@ -30,9 +30,9 @@ def plot_histories(histories, folds=None, style="bmh"):
             c = f"C{j+1}"
             ax[i].plot(epochs, train, "-", color=c)
             ax[i].plot(epochs, val, "--", color=c)
-            ax[i].set_xlabel("epoch")
-            ax[i].set_ylabel(metric)
-            ax[i].set_title(title[i])
+            ax[i].set_xlabel("epoch", fontsize=12)
+            ax[i].set_ylabel(metric, fontsize=12)
+            ax[i].set_title(title[i], fontsize=14)
             # plot text with final value
             ax[i].text(epochs[-1], train[-1], f"{train[-1]:.3f}", color=c)
             ax[i].text(epochs[-1], val[-1], f"{val[-1]:.3f}", color=c)
@@ -40,9 +40,12 @@ def plot_histories(histories, folds=None, style="bmh"):
             Line2D([0], [0], color=c, linestyle="-", label=f"fold {folds[j]}")
         )
 
-    x_max = len(histories[0]["loss"]) * 1.1
+    x_max = len(histories[0]["loss"]) * 1.15
     for i in range(0, no_subplots):
-        ax[i].legend(handles=handles, loc="upper right", fontsize=12)  # add legend
+        # ax[i].legend(handles=handles, loc=[0.5,0], fontsize=12)  # add legend
         ax[i].set_xlim(0, x_max)  # extend x-axis by 10%
-
-    fig.tight_layout()
+    # plt.legend(lines, labels, loc = 'lower center', bbox_to_anchor = (0, -0.1, 1, 1),
+    #        bbox_transform = plt.gcf().transFigure)
+    # fig.legend(handles=handles, loc=[-0.5,-0.2])
+    fig.legend(handles=handles, loc=[0.10, 0], fontsize=12, ncol=7)  # add legend
+    # fig.tight_layout()
