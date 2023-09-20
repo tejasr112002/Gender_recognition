@@ -1,3 +1,3 @@
 # Gender_recognition
-CNN model for Gender and age prediction
-[Project Paper](./Gender_classification_report.pdf)
+CNN model for Gender and age prediction <br>
+Check out the project paper [here](./Gender_classification_report.pdf)
